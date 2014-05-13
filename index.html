@@ -1,0 +1,290 @@
+<html>
+  <head>
+    <meta charsef="utf-8" />
+    <meta name="viewport" content="width=1024" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+
+    <title>Angular and HATEOAS</title>
+
+    <meta name="description" content="Angular and HATEOAS" />
+    <meta name="author" content="Will Jones" />
+
+    <link
+      href="http://fonts.googleapis.com/css?family=Open+Sans:regular,semibold,italic,italicsemibold|PT+Sans:400,700,400italic,700italic|PT+Serif:400,700,400italic,700italic"
+      rel="stylesheet" />
+
+    <link href="css/style.css" rel="stylesheet" />
+  </head>
+  <body class="impress-not-supported">
+    <div id="impress">
+      <div class="step" data-x="0" data-y="-50" data-z="-10"
+        data-scale="0.01">
+        <h1>Angular and HATEOAS</h1>
+      </div>
+
+      <div class="step" data-x="0" data-y="0" data-z="0" data-scale="1">
+        <h1>Coupling</h1>
+      </div>
+
+      <div class="step" data-x="0" data-y="1000" data-z="0" data-scale="1">
+        <h1>Licence and registration</h1>
+
+        <pre>
+          GET /users/odysseus
+          {
+            "forename": "Odysseus",
+            "surname": "Laertiades"
+          }
+
+          GET /users/odysseus/address
+          {
+            "houseName": "The palace",
+            "city": "Ithaca"
+          }
+        </pre>
+      </div>
+
+      <div class="step" data-x="0" data-y="2000" data-z="0" data-scale="1">
+        <pre><code data-language="javascript">
+          var apiRoot = 'http://api.example.com',
+              apiMonarch = apiRoot + '/users/odysseus',
+              apiAddress = apiMonarch + '/address';
+
+          $http.get(apiMonarch).then(function(response) {
+            $scope.monarch = response.data;
+          });
+
+          $http.get(apiAddress).then(function(response) {
+            $scope.address = response.data;
+          });
+
+          &lt;em&gt;{{ monarch.forename }}&lt;em&gt;
+            lives in {{ address.city }}.
+        </code></pre>
+      </div>
+
+      <div class="step" data-x="0" data-y="2000" data-z="0" data-scale="1">
+        <pre><code data-language="javascript">
+          var apiRoot = 'http://api.example.com',
+              apiMonarch = apiRoot + '/users/odysseus',
+              apiAddress = apiMonarch + '/address';
+
+          <em class="bad">$http.get(apiMonarch).then(function(response) {
+            $scope.monarch = response.data;
+          });
+
+          $http.get(apiAddress).then(function(response) {
+            $scope.address = response.data;
+          });</em>
+
+          &lt;em&gt;{{ monarch.forename }}&lt;em&gt;
+            lives in {{ address.city }}.
+        </code></pre>
+      </div>
+
+      <div class="step" data-x="0" data-y="3000" data-z="0" data-scale="1">
+        <pre><code data-language="javascript">
+          function userFactory(apiRoot, username) {
+            var apiUser = apiRoot + '/users/' + username;
+            <em class="good">return $http.get(apiUser).then(function(response) {
+              return {
+                forename: response.data.forename,
+                getAddress: function() {
+                  ... $http.get(apiUser + '/address') ...
+                }
+              };
+            });</em>
+          }
+
+          <em class="good">userFactory(apiRoot, 'odysseus')</em>.then(function(monarch) {
+            $scope.monarch = monarch;
+          });
+
+          &lt;em&gt;{{ monarch.forename }}&lt;em&gt;
+            lives in {{ address.city }}.
+        </code></pre>
+      </div>
+
+      <div class="step" data-x="0" data-y="3000" data-z="0" data-scale="1">
+        <pre><code data-language="javascript">
+          function userFactory(apiRoot, username) {
+            var apiUser = <em class="bad">apiRoot + '/users/' + username</em>;
+            return $http.get(apiUser).then(function(response) {
+              return {
+                forename: response.data.forename,
+                getAddress: function() {
+                  ... $http.get(<em class="bad">apiUser + '/address'</em>) ...
+                }
+              };
+            });
+          }
+
+          userFactory(apiRoot, <em class="bad">'odysseus'</em>).then(function(monarch) {
+            $scope.monarch = monarch;
+          });
+
+          &lt;em&gt;{{ monarch.forename }}&lt;em&gt;
+            lives in {{ address.city }}.
+        </code></pre>
+      </div>
+
+      <div class="step" data-x="0" data-y="4000" data-z="0" data-scale="1">
+        <h1 class="acronym">
+          <em>H</em>ypermedia <em>a</em>s <em>t</em>he <em>E</em>ngine
+          <em>o</em>f <em>A</em>pplication <em>S</em>tate
+        </h1>
+      </div>
+
+      <div class="step" data-x="0" data-y="5000" data-z="0" data-scale="1">
+        <h1>Licence; registration; family tree</h1>
+
+        <pre>
+          GET /
+          {
+            "_links": {
+              "Monarch": "/users/odysseus"
+            }
+          }
+
+          GET /users/odysseus
+          {
+            "forename": "Odysseus",
+            "surname": "Laertiades",
+            "_links": {
+              "Address": "/users/odysseus/address",
+              "Spouse": "/users/penelope"
+            }
+          }
+        </pre>
+      </div>
+
+      <div class="step" data-x="0" data-y="6000" data-z="0" data-scale="1">
+        <pre><code data-language="javascript">
+          function userFactory(apiRoot, username) {
+            var apiUser = <em class="bad">apiRoot + '/users/' + username</em>;
+            return $http.get(apiUser).then(function(response) {
+              return {
+                forename: response.data.forename,
+                getAddress: function() {
+                  ... $http.get(<em class="bad">apiUser + '/address'</em>) ...
+                }
+              };
+            });
+          }
+
+          userFactory(apiRoot, <em class="bad">'odysseus'</em>).then(function(monarch) {
+            $scope.monarch = monarch;
+          });
+
+          &lt;em&gt;{{ monarch.forename }}&lt;em&gt;
+            lives in {{ address.city }}.
+        </code></pre>
+      </div>
+
+      <div class="step" data-x="0" data-y="7000" data-z="0" data-scale="1">
+        <pre><code data-language="javascript">
+          function monarchFactory(apiRoot) {
+            return $http.get(apiRoot).then(function(response) {
+              return $http.get(<em class="good">response._links.Monarch</em>);
+            }).then(function(response) {
+              return {
+                forename: response.data.forename,
+                getAddress: function() {
+                  ... $http.get(<em class="good">response._links.Address</em>) ...
+                }
+              };
+            });
+          }
+
+          monarchFactory(apiRoot).then(function(monarch) {
+            $scope.monarch = monarch;
+          });
+
+          &lt;em&gt;{{ monarch.forename }}&lt;em&gt;
+            lives in {{ address.city }}.
+        </code></pre>
+      </div>
+
+      <div class="step" data-x="0" data-y="8000" data-z="0" data-scale="1">
+        <h1>Angular Ginsberg</h1>
+
+        <blockquote class="quote">I know too much and not enough</blockquote>
+      </div>
+
+      <div class="step" data-x="0" data-y="9000" data-z="0" data-scale="1">
+        <pre><code data-language="javascript">
+          function monarchFactory(apiRoot) {
+            return $http.get(apiRoot).then(function(response) {
+              return $http.get(<em class="good">response._links.Monarch</em>);
+            }).then(function(response) {
+              return {
+                forename: response.data.forename,
+                getAddress: function() {
+                  ... $http.get(<em class="good">response._links.Address</em>) ...
+                }
+              };
+            });
+          }
+
+          monarchFactory(apiRoot).then(function(monarch) {
+            $scope.monarch = monarch;
+          });
+
+          &lt;em&gt;{{ monarch.forename }}&lt;em&gt;
+            lives in {{ address.city }}.
+        </code></pre>
+      </div>
+
+      <div class="step" data-x="0" data-y="9000" data-z="0" data-scale="1">
+        <pre><code data-language="javascript">
+          function monarchFactory(apiRoot) {
+            return $http.get(apiRoot).then(function(response) {
+              return $http.get(<em class="bad">response._links.Monarch</em>);
+            }).then(function(response) {
+              return {
+                forename: response.data.forename,
+                getAddress: function() {
+                  ... $http.get(<em class="bad">response._links.Address</em>) ...
+                }
+              };
+            });
+          }
+
+          monarchFactory(apiRoot).then(function(monarch) {
+            $scope.monarch = monarch;
+          });
+
+          &lt;em&gt;{{ monarch.forename }}&lt;em&gt;
+            lives in {{ address.city }}.
+        </code></pre>
+      </div>
+
+      <div class="step" data-x="0" data-y="10000" data-z="0" data-scale="1">
+        <pre><code data-language="javascript">
+          $scope.response = $http.get(apiRoot);
+          $scope.reactions = [
+            {
+              relation: 'Monarch',
+              template: '&lt;ng-monarch monarch="%response" /&gt;'
+            }
+          ];
+
+          &lt;ng-react to="response" with="reactions" /&gt;
+        </code></pre>
+      </div>
+
+      <div class="step" data-x="0" data-y="11000" data-z="0" data-scale="1">
+        <h1>And remember...</h1>
+
+        <pre><code data-language="javascript">
+          TypeError: 'undefined' is not a function
+        </code></pre>
+      </div>
+    </div>
+
+    <script type="text/javascript" src="js/impress.js"></script>
+    <script type="text/javascript">
+      impress().init();
+    </script>
+  </body>
+</html>
