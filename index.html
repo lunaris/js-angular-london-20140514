@@ -11,7 +11,13 @@
 
     <link
       href="http://fonts.googleapis.com/css?family=Open+Sans:regular,semibold,italic,italicsemibold|PT+Sans:400,700,400italic,700italic|PT+Serif:400,700,400italic,700italic"
-      rel="stylesheet" />
+      rel="stylesheet"
+      type="text/css" />
+
+    <link
+      href="http://fonts.googleapis.com/css?family=VT323"
+      rel="stylesheet"
+      type="text/css" />
 
     <link href="css/style.css" rel="stylesheet" />
   </head>
@@ -22,11 +28,32 @@
         <h1>Angular and HATEOAS</h1>
       </div>
 
+      <div class="step" data-x="0" data-y="-50" data-z="-10"
+        data-scale="0.01">
+        <h1>HATEOAS <span class="invisible">(and Angular)</span></h1>
+      </div>
+
+      <div class="step" data-x="0" data-y="-50" data-z="-10"
+        data-scale="0.01">
+        <h1>HATEOAS (and Angular)</h1>
+      </div>
+
       <div class="step" data-x="0" data-y="0" data-z="0" data-scale="1">
         <h1>Coupling</h1>
       </div>
 
       <div class="step" data-x="0" data-y="1000" data-z="0" data-scale="1">
+        <h1>The Richardson Maturity Model</h1>
+
+        <ul class="maturity-model">
+          <li class="level" data-index="4">Hypermedia controls</li>
+          <li class="level" data-index="3">Verbs</li>
+          <li class="level" data-index="2">Resources</li>
+          <li class="level" data-index="1">&ldquo;The swamp of POX&rdquo;</li>
+        </ul>
+      </div>
+
+      <div class="step" data-x="0" data-y="2000" data-z="0" data-scale="1">
         <h1>Licence and registration</h1>
 
         <pre>
@@ -45,6 +72,28 @@
       </div>
 
       <div class="step" data-x="0" data-y="2000" data-z="0" data-scale="1">
+        <h1>Licence and registration</h1>
+
+        <pre>
+          GET /users/odysseus
+          {
+            "forename": "Odysseus",
+            "surname": "Laertiades"
+          }
+
+          GET /users/odysseus/address
+          {
+            "houseName": "The palace",
+            "city": "Ithaca"
+          }
+        </pre>
+
+        <p class="stats">
+          Lvl: 3 <span class="bar"></span>
+        </p>
+      </div>
+
+      <div class="step" data-x="0" data-y="3000" data-z="0" data-scale="1">
         <pre><code data-language="javascript">
           var apiRoot = 'http://api.example.com',
               apiMonarch = apiRoot + '/users/odysseus',
@@ -58,12 +107,12 @@
             $scope.address = response.data;
           });
 
-          &lt;em&gt;{{ monarch.forename }}&lt;em&gt;
+          &lt;em&gt;{{ monarch.forename }}&lt;/em&gt;
             lives in {{ address.city }}.
         </code></pre>
       </div>
 
-      <div class="step" data-x="0" data-y="2000" data-z="0" data-scale="1">
+      <div class="step" data-x="0" data-y="3000" data-z="0" data-scale="1">
         <pre><code data-language="javascript">
           var apiRoot = 'http://api.example.com',
               apiMonarch = apiRoot + '/users/odysseus',
@@ -77,12 +126,16 @@
             $scope.address = response.data;
           });</em>
 
-          &lt;em&gt;{{ monarch.forename }}&lt;em&gt;
+          &lt;em&gt;{{ monarch.forename }}&lt;/em&gt;
             lives in {{ address.city }}.
         </code></pre>
+
+        <p class="stats">
+          Lvl: 1 <span class="bar"></span>
+        </p>
       </div>
 
-      <div class="step" data-x="0" data-y="3000" data-z="0" data-scale="1">
+      <div class="step" data-x="0" data-y="4000" data-z="0" data-scale="1">
         <pre><code data-language="javascript">
           function userFactory(apiRoot, username) {
             var apiUser = apiRoot + '/users/' + username;
@@ -100,12 +153,39 @@
             $scope.monarch = monarch;
           });
 
-          &lt;em&gt;{{ monarch.forename }}&lt;em&gt;
+          &lt;em&gt;{{ monarch.forename }}&lt;/em&gt;
             lives in {{ address.city }}.
         </code></pre>
       </div>
 
-      <div class="step" data-x="0" data-y="3000" data-z="0" data-scale="1">
+      <div class="step" data-x="0" data-y="4000" data-z="0" data-scale="1">
+        <pre><code data-language="javascript">
+          function userFactory(apiRoot, username) {
+            var apiUser = apiRoot + '/users/' + username;
+            <em class="good">return $http.get(apiUser).then(function(response) {
+              return {
+                forename: response.data.forename,
+                getAddress: function() {
+                  ... $http.get(apiUser + '/address') ...
+                }
+              };
+            });</em>
+          }
+
+          <em class="good">userFactory(apiRoot, 'odysseus')</em>.then(function(monarch) {
+            $scope.monarch = monarch;
+          });
+
+          &lt;em&gt;{{ monarch.forename }}&lt;/em&gt;
+            lives in {{ address.city }}.
+        </code></pre>
+
+        <p class="stats">
+          Lvl: 1 <span class="bar"><span class="progress"></span></span>
+        </p>
+      </div>
+
+      <div class="step" data-x="0" data-y="4000" data-z="0" data-scale="1">
         <pre><code data-language="javascript">
           function userFactory(apiRoot, username) {
             var apiUser = <em class="bad">apiRoot + '/users/' + username</em>;
@@ -123,19 +203,23 @@
             $scope.monarch = monarch;
           });
 
-          &lt;em&gt;{{ monarch.forename }}&lt;em&gt;
+          &lt;em&gt;{{ monarch.forename }}&lt;/em&gt;
             lives in {{ address.city }}.
         </code></pre>
+
+        <p class="stats">
+          Lvl: 1 <span class="bar"><span class="progress"></span></span>
+        </p>
       </div>
 
-      <div class="step" data-x="0" data-y="4000" data-z="0" data-scale="1">
+      <div class="step" data-x="0" data-y="5000" data-z="0" data-scale="1">
         <h1 class="acronym">
           <em>H</em>ypermedia <em>a</em>s <em>t</em>he <em>E</em>ngine
           <em>o</em>f <em>A</em>pplication <em>S</em>tate
         </h1>
       </div>
 
-      <div class="step" data-x="0" data-y="5000" data-z="0" data-scale="1">
+      <div class="step" data-x="0" data-y="6000" data-z="0" data-scale="1">
         <h1>Licence; registration; family tree</h1>
 
         <pre>
@@ -159,6 +243,33 @@
       </div>
 
       <div class="step" data-x="0" data-y="6000" data-z="0" data-scale="1">
+        <h1>Licence; registration; family tree</h1>
+
+        <pre>
+          GET /
+          {
+            "_links": {
+              "Monarch": "/users/odysseus"
+            }
+          }
+
+          GET /users/odysseus
+          {
+            "forename": "Odysseus",
+            "surname": "Laertiades",
+            "_links": {
+              "Address": "/users/odysseus/address",
+              "Spouse": "/users/penelope"
+            }
+          }
+        </pre>
+
+        <p class="stats">
+          Lvl: 4 <span class="bar"></span>
+        </p>
+      </div>
+
+      <div class="step" data-x="0" data-y="7000" data-z="0" data-scale="1">
         <pre><code data-language="javascript">
           function userFactory(apiRoot, username) {
             var apiUser = <em class="bad">apiRoot + '/users/' + username</em>;
@@ -176,12 +287,16 @@
             $scope.monarch = monarch;
           });
 
-          &lt;em&gt;{{ monarch.forename }}&lt;em&gt;
+          &lt;em&gt;{{ monarch.forename }}&lt;/em&gt;
             lives in {{ address.city }}.
         </code></pre>
+
+        <p class="stats">
+          Lvl: 1 <span class="bar"><span class="progress"></span></span>
+        </p>
       </div>
 
-      <div class="step" data-x="0" data-y="7000" data-z="0" data-scale="1">
+      <div class="step" data-x="0" data-y="8000" data-z="0" data-scale="1">
         <pre><code data-language="javascript">
           function monarchFactory(apiRoot) {
             return $http.get(apiRoot).then(function(response) {
@@ -200,18 +315,12 @@
             $scope.monarch = monarch;
           });
 
-          &lt;em&gt;{{ monarch.forename }}&lt;em&gt;
+          &lt;em&gt;{{ monarch.forename }}&lt;/em&gt;
             lives in {{ address.city }}.
         </code></pre>
       </div>
 
       <div class="step" data-x="0" data-y="8000" data-z="0" data-scale="1">
-        <h1>Angular Ginsberg</h1>
-
-        <blockquote class="quote">I know too much and not enough</blockquote>
-      </div>
-
-      <div class="step" data-x="0" data-y="9000" data-z="0" data-scale="1">
         <pre><code data-language="javascript">
           function monarchFactory(apiRoot) {
             return $http.get(apiRoot).then(function(response) {
@@ -230,12 +339,50 @@
             $scope.monarch = monarch;
           });
 
-          &lt;em&gt;{{ monarch.forename }}&lt;em&gt;
+          &lt;em&gt;{{ monarch.forename }}&lt;/em&gt;
             lives in {{ address.city }}.
         </code></pre>
+
+        <p class="stats">
+          Lvl: 4 <span class="bar"></span>
+        </p>
       </div>
 
       <div class="step" data-x="0" data-y="9000" data-z="0" data-scale="1">
+        <h1>Angular Ginsberg</h1>
+
+        <blockquote class="quote">I know too much and not enough</blockquote>
+      </div>
+
+      <div class="step" data-x="0" data-y="10000" data-z="0" data-scale="1">
+        <pre><code data-language="javascript">
+          function monarchFactory(apiRoot) {
+            return $http.get(apiRoot).then(function(response) {
+              return $http.get(<em class="good">response._links.Monarch</em>);
+            }).then(function(response) {
+              return {
+                forename: response.data.forename,
+                getAddress: function() {
+                  ... $http.get(<em class="good">response._links.Address</em>) ...
+                }
+              };
+            });
+          }
+
+          monarchFactory(apiRoot).then(function(monarch) {
+            $scope.monarch = monarch;
+          });
+
+          &lt;em&gt;{{ monarch.forename }}&lt;/em&gt;
+            lives in {{ address.city }}.
+        </code></pre>
+
+        <p class="stats">
+          Lvl: 4 <span class="bar"></span>
+        </p>
+      </div>
+
+      <div class="step" data-x="0" data-y="10000" data-z="0" data-scale="1">
         <pre><code data-language="javascript">
           function monarchFactory(apiRoot) {
             return $http.get(apiRoot).then(function(response) {
@@ -254,12 +401,16 @@
             $scope.monarch = monarch;
           });
 
-          &lt;em&gt;{{ monarch.forename }}&lt;em&gt;
+          &lt;em&gt;{{ monarch.forename }}&lt;/em&gt;
             lives in {{ address.city }}.
         </code></pre>
+
+        <p class="stats">
+          Lvl: 4 <span class="bar"></span>
+        </p>
       </div>
 
-      <div class="step" data-x="0" data-y="10000" data-z="0" data-scale="1">
+      <div class="step" data-x="0" data-y="11000" data-z="0" data-scale="1">
         <pre><code data-language="javascript">
           $scope.response = $http.get(apiRoot);
           $scope.reactions = [
@@ -274,6 +425,35 @@
       </div>
 
       <div class="step" data-x="0" data-y="11000" data-z="0" data-scale="1">
+        <pre><code data-language="javascript">
+          $scope.response = $http.get(apiRoot);
+          $scope.reactions = [
+            {
+              relation: 'Monarch',
+              template: '&lt;ng-monarch monarch="%response" /&gt;'
+            }
+          ];
+
+          &lt;ng-react to="response" with="reactions" /&gt;
+        </code></pre>
+
+        <p class="stats">
+          Lvl: 4 <span class="bar"><span class="progress"></span></span>
+        </p>
+      </div>
+
+      <div class="step" data-x="0" data-y="12000" data-z="0" data-scale="1">
+        <h1>What's in a model?</h1>
+
+        <ul class="maturity-model">
+          <li class="level" data-index="4">Death of a URL</li>
+          <li class="level" data-index="3">Semantic separation</li>
+          <li class="level" data-index="2">Object identity</li>
+          <li class="level" data-index="1">Near-certain misery</li>
+        </ul>
+      </div>
+
+      <div class="step" data-x="0" data-y="13000" data-z="0" data-scale="1">
         <h1>And remember...</h1>
 
         <pre><code data-language="javascript">

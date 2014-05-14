@@ -67,7 +67,7 @@ i, em {
 }
 
 pre {
-  font-family: 'Monaco', 'Consolas', 'monospace';
+  font-family: 'Monaco', 'Consolas', monospace;
   font-size: 60%;
 }
 
@@ -102,7 +102,6 @@ a:focus {
 
   border: 1px solid #E4C652;
   border-radius: 10px;
-  background: #EEDC94;
 }
 
 .fallback-message p {
@@ -132,7 +131,7 @@ a:focus {
 
 .impress-enabled .step {
   margin: 0;
-  opacity: 0.3;
+  opacity: 0;
 
   -webkit-transition: opacity 1s;
   -moz-transition: opacity 1s;
@@ -157,6 +156,10 @@ h1 {
   font-size: 150%;
   margin-bottom: 2em;
   text-align: center;
+}
+
+.invisible {
+  opacity: 0;
 }
 
 .acronym em {
@@ -187,4 +190,54 @@ pre .bad {
 
 pre .good {
   color: green;
+}
+
+.maturity-model {
+  position: relative;
+}
+
+.maturity-model .level {
+  border: 1px solid black;
+  margin: 0 auto 0.25em;
+  padding: 0.5em;
+  text-align: center;
+  width: 50%;
+}
+
+.maturity-model .level:before {
+  content: 'Level ' attr(data-index);
+  left: 5%;
+  position: absolute;
+}
+
+.stats {
+  bottom: 0;
+  font-family: 'VT323', 'Monaco', 'Consolas', monospace;
+  font-size: 80%;
+  position: absolute;
+  right: 0;
+}
+
+.bar {
+  border: 3px solid black;
+  display: inline-block;
+  height: 0.5em;
+  margin-bottom: -0.1em;
+  width: 100px;
+}
+
+.bar .progress {
+  background-color: red;
+  display: inline-block;
+  height: 0.5em;
+  width: 0px;
+}
+
+.present .bar .progress {
+  width: 50px;
+  -webkit-transition: width 1.5s;
+  -moz-transition: width 1.5s;
+  -ms-transition: width 1.5s;
+  -o-transition: width 1.5s;
+  transition: width 1.5s;
 }
